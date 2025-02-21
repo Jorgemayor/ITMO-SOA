@@ -1,0 +1,166 @@
+<div class="container mt-5">
+    <h1 class="mb-4">Product</h1>
+    <p>Represents the products available for sale.</p>
+    <button class="btn btn-success mb-4" id="newProductButton">Add Product</button>
+    
+    <!-- Product Table -->
+    <table id="productsTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<!-- Product Modal -->
+<div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productModalLabel">Add Product</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm">
+                        <div class="form-group">
+                            <label for="productID">Product ID:</label>
+                            <input type="number" class="form-control" id="productID" name="productID">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="name">Name:</label>
+                            <input type="text" class="form-control" id="name" name="name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="price">Price:</label>
+                            <input type="number" class="form-control" id="price" name="price" required>
+                        </div>
+                        
+                        
+                    <button type="submit" class="btn btn-primary" id="saveButton">Save</button>
+                    <button type="button" class="btn btn-primary" id="updateButton">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Fetch all products and display them
+        function loadProducts() {
+            $.ajax({
+                url: 'resources/api/product',
+                method: 'GET',
+                contentType: 'application/json',
+                success: function (data) {
+                    var tableBody = $('#productsTable tbody');
+                    tableBody.empty();
+                    data.forEach(function (product) {
+                        var row = '<tr>' +
+                            '<td>' + product.productID + '</td>' +
+                            '<td>' + product.name + '</td>' +
+                            '<td>' + product.price + '</td>' +
+                            '<td class="table-buttons">' +
+                            '<button class="btn btn-sm btn-primary mr-1" onclick="editProduct(\'' + product.productID + '\')">Edit</button>' +
+                            '<button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + product.productID + '\')">Delete</button>' +
+                            '</td>' +
+                            '</tr>';
+                        tableBody.append(row);
+                    });
+                }
+            });
+        }
+
+        loadProducts();
+
+
+        // Open modal for new product
+        $('#newProductButton').on('click', function () {
+            $('#productForm')[0].reset();
+            $('#productID').closest('.form-group').hide();
+            $('#productModalLabel').text('Add Product');
+            $('#saveButton').show();
+            $('#updateButton').hide();
+            $('#productModal').modal('show');
+        });
+
+        // Create new product
+        $('#productForm').on('submit', function (e) {
+            e.preventDefault();
+            var product = {
+                        name: $('#name').val(),
+                        price: $('#price').val(),
+            };
+            $.ajax({
+                url: 'resources/api/product',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(product),
+                success: function () {
+                    loadProducts();
+                    $('#productModal').modal('hide');
+                    $('#productForm')[0].reset();
+                }
+            });
+        });
+
+        // Update existing product
+        $('#updateButton').on('click', function () {
+            var product = {
+                    productID: $('#productID').val(),
+                    name: $('#name').val(),
+                    price: $('#price').val(),
+            };
+            $.ajax({
+                url: 'resources/api/product',
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(product),
+                success: function () {
+                    loadProducts();
+                    $('#productModal').modal('hide');
+                    $('#productForm')[0].reset();
+                }
+            });
+        });
+
+        // Edit product (populate form)
+        window.editProduct = function (productID) {
+            $.ajax({
+                url: 'resources/api/product/' + productID,
+                method: 'GET',
+                contentType: 'application/json',
+                success: function (product) {
+                    $('#productID').val(product.productID).prop('disabled', true).closest('.form-group').show();
+                    $('#name').val(product.name);
+                    $('#price').val(product.price);
+                    $('#productModalLabel').text('Edit Product');
+                    $('#saveButton').hide();
+                    $('#updateButton').show();
+                    $('#productModal').modal('show');
+                }
+            });
+        };
+
+        // Delete product
+        window.deleteProduct = function (productID) {
+            $.ajax({
+                url: 'resources/api/product/' + productID,
+                method: 'DELETE',
+                success: function () {
+                    loadProducts();
+                }
+            });
+        };
+    });
+</script>

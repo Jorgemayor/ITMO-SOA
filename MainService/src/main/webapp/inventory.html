@@ -1,0 +1,198 @@
+<div class="container mt-5">
+    <h1 class="mb-4">Inventory</h1>
+    <p>Represents the inventory of products in stock.</p>
+    <button class="btn btn-success mb-4" id="newInventoryButton">Add Inventory</button>
+    
+    <!-- Inventory Table -->
+    <table id="inventoriesTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Inventory ID</th>
+                <th>Quantity</th>
+                <th>Location</th>
+                <th>Product</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<!-- Inventory Modal -->
+<div class="modal fade" id="inventoryModal" tabindex="-1" role="dialog" aria-labelledby="inventoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="inventoryModalLabel">Add Inventory</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="inventoryForm">
+                        <div class="form-group">
+                            <label for="inventoryID">Inventory ID:</label>
+                            <input type="number" class="form-control" id="inventoryID" name="inventoryID">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="quantity">Quantity:</label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="location">Location:</label>
+                            <input type="text" class="form-control" id="location" name="location">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="productSelect">Product:</label>
+                            <select class="form-control" id="productSelect" name="product">
+                                <!-- Product will be populated here -->
+                            </select>
+                        </div>
+                        
+                    <button type="submit" class="btn btn-primary" id="saveButton">Save</button>
+                    <button type="button" class="btn btn-primary" id="updateButton">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Fetch all inventorys and display them
+        function loadInventories() {
+            $.ajax({
+                url: 'resources/api/inventory',
+                method: 'GET',
+                contentType: 'application/json',
+                success: function (data) {
+                    var tableBody = $('#inventoriesTable tbody');
+                    tableBody.empty();
+                    data.forEach(function (inventory) {
+                        var row = '<tr>' +
+                            '<td>' + inventory.inventoryID + '</td>' +
+                            '<td>' + inventory.quantity + '</td>' +
+                            '<td>' + inventory.location + '</td>' +
+                            '<td>' + (inventory?.product?.name || '') + '</td>' +
+                            '<td class="table-buttons">' +
+                            '<button class="btn btn-sm btn-primary mr-1" onclick="editInventory(\'' + inventory.inventoryID + '\')">Edit</button>' +
+                            '<button class="btn btn-sm btn-danger" onclick="deleteInventory(\'' + inventory.inventoryID + '\')">Delete</button>' +
+                            '</td>' +
+                            '</tr>';
+                        tableBody.append(row);
+                    });
+                }
+            });
+        }
+
+        loadInventories();
+
+        function loadProduct() {
+            $.ajax({
+                url: 'resources/api/product',
+                method: 'GET',
+                contentType: 'application/json',
+                success: function (data) {
+                    var productSelect = $('#productSelect');
+                    productSelect.empty();
+                    data.forEach(function (product) {
+                        var option = '<option value="' + product.productID + '">' + product.name + '</option>';
+                        productSelect.append(option);
+                    });
+                }
+            });
+        }
+        loadProduct();
+
+        // Open modal for new inventory
+        $('#newInventoryButton').on('click', function () {
+            $('#inventoryForm')[0].reset();
+            $('#inventoryID').closest('.form-group').hide();
+            $('#inventoryModalLabel').text('Add Inventory');
+            $('#saveButton').show();
+            $('#updateButton').hide();
+            $('#inventoryModal').modal('show');
+            loadProduct();
+        });
+
+        // Create new inventory
+        $('#inventoryForm').on('submit', function (e) {
+            e.preventDefault();
+            var inventory = {
+                        quantity: $('#quantity').val(),
+                        location: $('#location').val(),
+                    product: {
+                        productID: $('#productSelect').val()
+                    },
+            };
+            $.ajax({
+                url: 'resources/api/inventory',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(inventory),
+                success: function () {
+                    loadInventories();
+                    $('#inventoryModal').modal('hide');
+                    $('#inventoryForm')[0].reset();
+                }
+            });
+        });
+
+        // Update existing inventory
+        $('#updateButton').on('click', function () {
+            var inventory = {
+                    inventoryID: $('#inventoryID').val(),
+                    quantity: $('#quantity').val(),
+                    location: $('#location').val(),
+                    product: {
+                        productID: $('#productSelect').val()
+                    },
+            };
+            $.ajax({
+                url: 'resources/api/inventory',
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(inventory),
+                success: function () {
+                    loadInventories();
+                    $('#inventoryModal').modal('hide');
+                    $('#inventoryForm')[0].reset();
+                }
+            });
+        });
+
+        // Edit inventory (populate form)
+        window.editInventory = function (inventoryID) {
+            $.ajax({
+                url: 'resources/api/inventory/' + inventoryID,
+                method: 'GET',
+                contentType: 'application/json',
+                success: function (inventory) {
+                    $('#inventoryID').val(inventory.inventoryID).prop('disabled', true).closest('.form-group').show();
+                    $('#quantity').val(inventory.quantity);
+                    $('#location').val(inventory.location);
+                    $('#productSelect').val(inventory?.product?.productID);
+                    $('#inventoryModalLabel').text('Edit Inventory');
+                    $('#saveButton').hide();
+                    $('#updateButton').show();
+                    $('#inventoryModal').modal('show');
+                }
+            });
+        };
+
+        // Delete inventory
+        window.deleteInventory = function (inventoryID) {
+            $.ajax({
+                url: 'resources/api/inventory/' + inventoryID,
+                method: 'DELETE',
+                success: function () {
+                    loadInventories();
+                }
+            });
+        };
+    });
+</script>
