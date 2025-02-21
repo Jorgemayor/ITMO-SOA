@@ -1,0 +1,510 @@
+openapi: 3.0.3
+info:
+  title: Routes service - Rest endpoints
+  description: |-
+    Main process server. Manages routes, coordinates and locations.
+  contact:
+    email: jorge.e.mayor@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Report
+  url: http://github.com/jorgemayor/ITMO-SOA
+servers:
+  - url: https://localhost:8080/api/v1
+tags:
+  - name: route
+    description: Manage routes and destinations
+  - name: extra
+    description: Additional endpoints to solve specific tasks from the lab
+paths:
+  /routes:
+    get:
+      tags:
+        - route
+      summary: Get a list of routes with the ability to sort, filter and paginate
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: Specifies the page number to be paginated.
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: pageSize
+          in: query
+          required: false
+          description: The specified page size for pagination.
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+        - name: limit
+          in: query
+          description: The numbers of items to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+        - name: offset
+          in: query
+          description: The number of items to skip before starting to collect the result set
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            example: 10
+        - name: sort
+          in: query
+          description: Array of fields used for sorting. 
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              default: id
+              enum:
+                - id
+                - name
+                - coordinates
+                - creationDate
+                - from
+                - to
+                - distance
+        - name: sortDirection
+          in: query
+          description: Sorting direction
+          required: false
+          schema:
+            type: string
+            default: ASC
+            enum:
+              - ASC
+              - DESC
+        - name: filter
+          in: query
+          required: false
+          description: Array of fields used for filtering. Each element must contain the name of the field and the filtering method in parentheses, as well as the value that will be used for filtering.
+          schema:
+            type: array
+            items:
+              type: string
+              example: id[eq]=1
+              pattern: '^(id|name|coordinates\.x|coordinates\.y|creationDate|from\.x|from\.y|from\.z|to\.x|to\.y|to\.z|distance)\[(eq|ne|gt|lt|gte|lte)\]=.+$'
+              
+      responses:
+        '200':
+          description: Successful response with an array
+          content:
+            application/json:
+              schema:
+                title: RouteResponse
+                type: object
+                properties:
+                  routes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Route'
+                  total:
+                    type: integer
+                    description: Total amount of elements
+                  page:
+                    type: integer
+                    description: Specifies the page number to be paginated.
+                  pageSize:
+                    type: integer
+                    description: The specified page size for pagination.
+                  limit:
+                    type: integer
+                    description: The numbers of items to return
+                  offset:
+                    type: integer
+                    description: The number of items to skip before starting to collect the result set
+        '204':
+          $ref: '#/components/responses/204'
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+  /route:
+    post:
+      tags:
+        - route
+      summary: Add a new route
+      description: Add a new route
+      operationId: addRoute
+      requestBody:
+        description: Create a new route
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Route'
+        '400':
+          $ref: '#/components/responses/400'
+        '422':
+          $ref: '#/components/responses/422'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+  
+  /routes/{id}:
+    get:
+      tags:
+      - route
+      summary: Get route by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Information of the route
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Route'
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+            $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+    put:
+      tags:
+        - route
+      summary: Update route by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteRequest'
+      responses:
+        '200':
+          description: Route successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Route'
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+            $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+    delete:
+      tags:
+        - route
+      summary: Delete route by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '204':
+          description: Route successfully deleted
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+            $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+  /route/minimum-name:
+    get:
+      tags:
+        - extra
+      summary: Get the route with the first name alphabetically.
+      responses:
+        '200':
+          description: Information of the route
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Route'
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+            $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+  /routes/equal-distance/{distance}:
+    get:
+      tags:
+        - extra
+      summary: Get the routes which distance is equal to the one provided
+      parameters:
+        - name: distance
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Successful response with an array
+          content:
+            application/json:
+              schema:
+                title: RouteResponse
+                type: object
+                properties:
+                  routes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Route'
+        '204':
+          $ref: '#/components/responses/204'
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+  /routes/less-distance/{distance}:
+    get:
+      tags:
+        - extra
+      summary: Get the routes which distance is less than the one provided
+      parameters:
+        - name: distance
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Successful response with an array
+          content:
+            application/json:
+              schema:
+                title: RouteResponse
+                type: object
+                properties:
+                  routes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Route'
+        '204':
+          $ref: '#/components/responses/204'
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+
+components:
+  schemas:
+    Coordinates:
+      type: object
+      properties:
+        x:
+          type: number
+          format: float
+          nullable: false
+        y:
+          type: number
+          format: double
+          nullable: false
+      required:
+        - x
+        - y
+    LocationFrom:
+      type: object
+      nullable: true
+      properties:
+        x:
+          type: integer
+          format: int64
+          nullable: false
+        y:
+          type: integer
+          format: int32
+          nullable: false
+        name:
+          type: string
+          nullable: true
+          maxLength: 500
+      required:
+        - x
+        - y
+        - name
+    LocationTo:
+      type: object
+      nullable: true
+      properties:
+        x:
+          type: number
+          format: float
+          nullable: false
+        y:
+          type: number
+          format: double
+          nullable: false
+        z:
+          type: integer
+          format: int32
+          nullable: false
+      required:
+        - x
+        - y
+        - z
+    Route:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: |
+            - Cannot be null
+            - Must be greater than 0
+            - Must be unique
+            - Auto-generated
+          readOnly: true
+          minimum: 1
+          format: int64
+          nullable: false
+        name:
+          type: string
+          description: |
+            Name of route
+            - Cannot be null
+            - Cannot be empty
+          minLength: 1
+          nullable: false
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+          description: |
+            Current location
+             - Cannot be null
+        creationDate:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: false
+        from:
+          $ref: '#/components/schemas/LocationFrom'
+        to:
+          $ref: '#/components/schemas/LocationTo'
+        distance:
+          type: integer
+          format: int64
+          nullable: false
+      required:
+        - id
+        - name
+        - coordinates
+        - creationDate
+        - distance
+    RouteRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          nullable: false
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+        from:
+          $ref: '#/components/schemas/LocationFrom'
+        to:
+          $ref: '#/components/schemas/LocationTo'
+        distance:
+          type: integer
+          format: int64
+          nullable: false
+      required:
+        - name
+        - coordinates
+        - distance
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          description: Code that identifies the kind of error
+          type: string
+          example: 'BadRequest'
+        message:
+          description: Message with information about the error
+          type: string
+          example: Invalid request. Error description will be returned in the response body.
+  responses:
+    '200':
+      description: Successful
+    '204':
+      description: No content
+    '400':
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '409':
+      description: Duplicate request that causes a conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '422':
+      description: Validation exception
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '503':
+      description: Service is temporarily unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
