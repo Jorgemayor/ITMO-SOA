@@ -233,8 +233,12 @@ paths:
             type: integer
             minimum: 1
       responses:
-        '204':
+        '200':
           description: Route successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '400':
           $ref: '#/components/responses/400'
         '404':

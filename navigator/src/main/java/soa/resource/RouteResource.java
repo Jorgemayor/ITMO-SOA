@@ -261,7 +261,7 @@ public class RouteResource {
             boolean deleted = routeService.deleteRoute(id);
             
             if (deleted) {
-                return Response.noContent().build();
+                return Response.ok(new ErrorResponse("Success", "Route deleted successfully")).build();
             }
             
             return Response.status(Response.Status.NOT_FOUND)
