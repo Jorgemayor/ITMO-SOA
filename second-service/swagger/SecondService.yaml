@@ -1,0 +1,334 @@
+openapi: 3.0.3
+info:
+  title: Navigator service - Rest endpoints
+  description: |-
+    Second process server. Manages navigator, finds routes between places and adds them.
+  contact:
+    email: jorge.e.mayor@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Repository
+  url: http://github.com/jorgemayor/ITMO-SOA
+servers:
+  - url: https://localhost:8080/navigator
+tags:
+  - name: navigator
+    description: Manages routes and destinations
+paths:
+  /routes/{id-from}/{id-to}/{order-by}:
+    get:
+      tags:
+        - navigator
+      summary: Get a list of routes with the ability to sort between the given locations
+      parameters:
+        - name: id-from
+          in: path
+          description: Location of procedence
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            example: 1
+        - name: id-to
+          in: path
+          description: Destination
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            example: 1
+        - name: order-by
+          in: path
+          description: Array of fields used for sorting. 
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              default: id
+              enum:
+                - id
+                - name
+                - coordinates
+                - creationDate
+                - from
+                - to
+                - distance
+        - name: sortDirection
+          in: query
+          description: Sorting direction
+          required: false
+          schema:
+            type: string
+            default: ASC
+            enum:
+              - ASC
+              - DESC
+              
+      responses:
+        '200':
+          description: Successful response with an array
+          content:
+            application/json:
+              schema:
+                title: RouteResponse
+                type: object
+                properties:
+                  routes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Route'
+                  total:
+                    type: integer
+                    description: Total amount of elements
+                  page:
+                    type: integer
+                    description: Specifies the page number to be paginated.
+                  pageSize:
+                    type: integer
+                    description: The specified page size for pagination.
+                  limit:
+                    type: integer
+                    description: The numbers of items to return
+                  offset:
+                    type: integer
+                    description: The number of items to skip before starting to collect the result set
+        '204':
+          $ref: '#/components/responses/204'
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+  /route/add/{id-from}/{id-to}/{distance}:
+    post:
+      tags:
+        - navigator
+      summary: Add a new route
+      description: Add a new route
+      parameters:
+        - name: id-from
+          in: path
+          description: Location of procedence
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            example: 1
+        - name: id-to
+          in: path
+          description: Destination
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            example: 1
+        - name: distance
+          in: path 
+          description: distance between locations
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 0
+            nullable: false
+      requestBody:
+        description: Create a new route
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NavigatorPostRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Route'
+        '400':
+          $ref: '#/components/responses/400'
+        '422':
+          $ref: '#/components/responses/422'
+        '500':
+          $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
+
+components:
+  schemas:
+    Coordinates:
+      type: object
+      properties:
+        x:
+          type: number
+          format: float
+          nullable: false
+        y:
+          type: number
+          format: double
+          nullable: false
+      required:
+        - x
+        - y
+    LocationFrom:
+      type: object
+      nullable: true
+      properties:
+        x:
+          type: integer
+          format: int64
+          nullable: false
+        y:
+          type: integer
+          format: int32
+          nullable: false
+        name:
+          type: string
+          nullable: true
+          maxLength: 500
+      required:
+        - x
+        - y
+        - name
+    LocationTo:
+      type: object
+      nullable: true
+      properties:
+        x:
+          type: number
+          format: float
+          nullable: false
+        y:
+          type: number
+          format: double
+          nullable: false
+        z:
+          type: integer
+          format: int32
+          nullable: false
+      required:
+        - x
+        - y
+        - z
+    Route:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: |
+            - Cannot be null
+            - Must be greater than 0
+            - Must be unique
+            - Auto-generated
+          readOnly: true
+          minimum: 1
+          format: int64
+          nullable: false
+        name:
+          type: string
+          description: |
+            Name of route
+            - Cannot be null
+            - Cannot be empty
+          minLength: 1
+          nullable: false
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+          description: |
+            Current location
+             - Cannot be null
+        creationDate:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: false
+        from:
+          $ref: '#/components/schemas/LocationFrom'
+        to:
+          $ref: '#/components/schemas/LocationTo'
+        distance:
+          type: integer
+          format: int64
+          nullable: false
+      required:
+        - id
+        - name
+        - coordinates
+        - creationDate
+        - distance
+    NavigatorPostRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          nullable: false
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+      required:
+        - name
+        - coordinates
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          description: Code that identifies the kind of error
+          type: string
+          example: 'BadRequest'
+        message:
+          description: Message with information about the error
+          type: string
+          example: Invalid request. Error description will be returned in the response body.
+  responses:
+    '200':
+      description: Successful
+    '204':
+      description: No content
+    '400':
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '404':
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '409':
+      description: Duplicate request that causes a conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '422':
+      description: Validation exception
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    '503':
+      description: Service is temporarily unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
