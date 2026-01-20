@@ -1,6 +1,6 @@
 import type { Route, RouteRequest, RouteResponse } from "@/types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://localhost:8181/api/v1";
 const SECOND_SERVICE_URL = process.env.NEXT_PUBLIC_SECOND_SERVICE_URL || "http://localhost:8081/navigator";
 
 const handleResponse = async (response: Response) => {
