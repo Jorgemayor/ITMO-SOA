@@ -108,10 +108,10 @@ public class NavigatorController {
                         .body(new com.example.restservice.model.Error("BadRequest", "id-to must be greater than 0"));
             }
             
-            if (distance == null || distance < 0) {
+            if (distance == null || distance < 1) {
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
-                        .body(new com.example.restservice.model.Error("BadRequest", "distance must be greater than or equal to 0"));
+                        .body(new com.example.restservice.model.Error("BadRequest", "distance must be greater than 1"));
             }
 
             // Validate request body
