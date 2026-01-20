@@ -1,8 +1,12 @@
 import type { Route, RouteRequest, RouteResponse } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+const SECOND_SERVICE_URL = process.env.NEXT_PUBLIC_SECOND_SERVICE_URL || "http://localhost:8081/navigator";
 
 const handleResponse = async (response: Response) => {
+  if (response.status === 204) {
+    return { routes: [], total: 0, page: 0, pageSize: 0, limit: 0 };
+  }
   if (!response.ok) {
     let message = response.statusText;
     try {
@@ -79,5 +83,34 @@ export async function getRoutesWithEqualDistance(distance: number): Promise<Rout
 
 export async function getRoutesWithLessDistance(distance: number): Promise<RouteResponse> {
   const response = await fetch(`${API_BASE_URL}/routes/less-distance/${distance}`);
+  return handleResponse(response);
+}
+
+export async function findRoutesBetweenLocations(
+  idFrom: number,
+  idTo: number,
+  orderBy: string,
+  sortDirection: "ASC" | "DESC" = "ASC"
+): Promise<RouteResponse> {
+  const response = await fetch(
+    `${SECOND_SERVICE_URL}/routes/${idFrom}/${idTo}/${orderBy}?sortDirection=${sortDirection}`
+  );
+  return handleResponse(response);
+}
+
+export async function addRouteBetweenLocations(
+  idFrom: number,
+  idTo: number,
+  distance: number,
+  routeData: { name: string; coordinates: { x: number; y: number } }
+): Promise<Route> {
+  const response = await fetch(
+    `${SECOND_SERVICE_URL}/route/add/${idFrom}/${idTo}/${distance}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(routeData),
+    }
+  );
   return handleResponse(response);
 }

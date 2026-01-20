@@ -4,6 +4,7 @@ import { useState } from "react";
 import { RouteList } from "@/components/RouteList";
 import { RouteForm } from "@/components/RouteForm";
 import { SpecialOperations } from "@/components/SpecialOperations";
+import { NavigatorOperations } from "@/components/NavigatorOperations";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import type { Route } from "@/types";
@@ -47,11 +48,12 @@ export default function Home() {
         />
       ) : (
         <div className="space-y-8">
-          <SpecialOperations />
           <div className="space-y-4">
             <h2 className="text-2xl font-semibold">Routes</h2>
             <RouteList onEdit={handleEdit} refreshTrigger={refreshTrigger} />
           </div>
+          <SpecialOperations />
+          <NavigatorOperations onRouteAdded={() => setRefreshTrigger(prev => prev + 1)} />
         </div>
       )}
     </main>
