@@ -132,11 +132,20 @@ export function RouteList({ onEdit, refreshTrigger }: RouteListProps) {
               <TableHead className="cursor-pointer" onClick={() => toggleSort("name")}>
                 Name <ArrowUpDown className="inline h-4 w-4" />
               </TableHead>
-              <TableHead>Coordinates</TableHead>
-              <TableHead>From</TableHead>
-              <TableHead>To</TableHead>
+              <TableHead className="cursor-pointer" onClick={() => toggleSort("coordinates")}>
+                Coordinates <ArrowUpDown className="inline h-4 w-4" />
+              </TableHead>
+              <TableHead className="cursor-pointer" onClick={() => toggleSort("from")}>
+                From <ArrowUpDown className="inline h-4 w-4" />
+              </TableHead>
+              <TableHead className="cursor-pointer" onClick={() => toggleSort("to")}>
+                To <ArrowUpDown className="inline h-4 w-4" />
+              </TableHead>
               <TableHead className="cursor-pointer" onClick={() => toggleSort("distance")}>
                 Distance <ArrowUpDown className="inline h-4 w-4" />
+              </TableHead>
+              <TableHead className="cursor-pointer" onClick={() => toggleSort("creationDate")}>
+                Creation Date <ArrowUpDown className="inline h-4 w-4" />
               </TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -154,6 +163,7 @@ export function RouteList({ onEdit, refreshTrigger }: RouteListProps) {
                   {route.to ? `${route.to.name || ''} (${route.to.x}, ${route.to.y}, ${route.to.z})` : "-"}
                 </TableCell>
                 <TableCell>{route.distance}</TableCell>
+                <TableCell>{new Date(route.creationDate).toLocaleString()}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button variant="ghost" size="icon" onClick={() => onEdit(route)}>
@@ -168,7 +178,7 @@ export function RouteList({ onEdit, refreshTrigger }: RouteListProps) {
             ))}
             {data?.routes.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center h-24">
+                <TableCell colSpan={8} className="text-center h-24">
                   No routes found.
                 </TableCell>
               </TableRow>
