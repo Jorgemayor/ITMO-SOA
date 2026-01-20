@@ -16,6 +16,7 @@ export interface LocationTo {
   id?: number;
   x: number;
   y: number;
+  z: number;
   name?: string;
 }
 
@@ -44,6 +45,7 @@ export interface RouteRequest {
   to?: {
     x: number;
     y: number;
+    z: number;
     name?: string;
   };
   distance: number;

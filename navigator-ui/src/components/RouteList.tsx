@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { fetchRoutes, deleteRoute } from "@/lib/api";
 import type { Route, RouteResponse } from "@/types";
 import { Edit, Trash2, ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
+import { toast } from "sonner";
 
 interface RouteListProps {
   onEdit: (route: Route) => void;
@@ -56,9 +57,10 @@ export function RouteList({ onEdit, refreshTrigger }: RouteListProps) {
     if (confirm("Are you sure you want to delete this route?")) {
       try {
         await deleteRoute(id);
+        toast.success("Route deleted successfully");
         loadRoutes();
-      } catch (error) {
-        alert("Failed to delete route");
+      } catch (error: any) {
+        toast.error(error.message || "Failed to delete route");
       }
     }
   };
@@ -149,7 +151,7 @@ export function RouteList({ onEdit, refreshTrigger }: RouteListProps) {
                   {route.from ? `${route.from.name || ''} (${route.from.x}, ${route.from.y}, ${route.from.z})` : "-"}
                 </TableCell>
                 <TableCell>
-                  {route.to ? `${route.to.name || ''} (${route.to.x}, ${route.to.y})` : "-"}
+                  {route.to ? `${route.to.name || ''} (${route.to.x}, ${route.to.y}, ${route.to.z})` : "-"}
                 </TableCell>
                 <TableCell>{route.distance}</TableCell>
                 <TableCell>

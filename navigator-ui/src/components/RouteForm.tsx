@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { createRoute, updateRoute } from "@/lib/api";
 import type { Route, RouteRequest } from "@/types";
+import { toast } from "sonner";
 
 interface RouteFormProps {
   initialData?: Route;
@@ -49,12 +50,14 @@ export function RouteForm({ initialData, onSuccess, onCancel }: RouteFormProps) 
 
     const toX = formData.get("toX");
     const toY = formData.get("toY");
+    const toZ = formData.get("toZ");
     const toName = formData.get("toName");
 
-    if (toX && toY) {
+    if (toX && toY && toZ) {
       data.to = {
         x: Number(toX),
         y: Number(toY),
+        z: Number(toZ),
         name: toName as string || undefined,
       };
     }
@@ -62,12 +65,16 @@ export function RouteForm({ initialData, onSuccess, onCancel }: RouteFormProps) 
     try {
       if (initialData) {
         await updateRoute(initialData.id, data);
+        toast.success("Route updated successfully");
       } else {
         await createRoute(data);
+        toast.success("Route created successfully");
       }
       onSuccess();
     } catch (err: any) {
-      setError(err.message || "An error occurred");
+      const message = err.message || "An error occurred";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -113,9 +120,10 @@ export function RouteForm({ initialData, onSuccess, onCancel }: RouteFormProps) 
 
           <div className="space-y-2">
             <Label>To Location (Optional)</Label>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-2">
               <Input name="toX" type="number" placeholder="X" defaultValue={initialData?.to?.x} step="any" />
               <Input name="toY" type="number" placeholder="Y" defaultValue={initialData?.to?.y} step="any" />
+              <Input name="toZ" type="number" placeholder="Z" defaultValue={initialData?.to?.z} step="any" />
             </div>
             <Input name="toName" placeholder="Location Name" defaultValue={initialData?.to?.name} />
           </div>

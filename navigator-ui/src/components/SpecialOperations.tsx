@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getRouteWithMinimumName, getRoutesWithEqualDistance, getRoutesWithLessDistance } from "@/lib/api";
 import type { Route } from "@/types";
+import { toast } from "sonner";
 
 export function SpecialOperations() {
   const [result, setResult] = useState<any>(null);
@@ -15,8 +16,9 @@ export function SpecialOperations() {
     try {
       const res = await getRouteWithMinimumName();
       setResult({ type: "Minimum Name Route", data: res });
+      toast.success("Found route with minimum name");
     } catch (e: any) {
-      alert(e.message);
+      toast.error(e.message);
     }
   };
 
@@ -24,8 +26,9 @@ export function SpecialOperations() {
     try {
       const res = await getRoutesWithEqualDistance(Number(distance));
       setResult({ type: `Routes with Distance = ${distance}`, data: res.routes });
+      toast.success(`Found ${res.routes.length} routes with equal distance`);
     } catch (e: any) {
-      alert(e.message);
+      toast.error(e.message);
     }
   };
 
@@ -33,8 +36,9 @@ export function SpecialOperations() {
     try {
       const res = await getRoutesWithLessDistance(Number(distance));
       setResult({ type: `Routes with Distance < ${distance}`, data: res.routes });
+      toast.success(`Found ${res.routes.length} routes with less distance`);
     } catch (e: any) {
-      alert(e.message);
+      toast.error(e.message);
     }
   };
 
