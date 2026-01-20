@@ -148,7 +148,7 @@ export function RouteList({ onEdit, refreshTrigger }: RouteListProps) {
                 <TableCell className="font-medium">{route.name}</TableCell>
                 <TableCell>({route.coordinates.x}, {route.coordinates.y})</TableCell>
                 <TableCell>
-                  {route.from ? `${route.from.name || ''} (${route.from.x}, ${route.from.y}, ${route.from.z})` : "-"}
+                  {route.from ? `${route.from.name || ''} (${route.from.x}, ${route.from.y})` : "-"}
                 </TableCell>
                 <TableCell>
                   {route.to ? `${route.to.name || ''} (${route.to.x}, ${route.to.y}, ${route.to.z})` : "-"}
