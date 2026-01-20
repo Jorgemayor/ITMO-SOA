@@ -38,23 +38,22 @@ public class RouteService {
     public RouteResponse findRoutesBetweenLocations(Long idFrom, Long idTo, String orderBy, String sortDirection) {
         try {
             // Build the URL with query parameters
-            String url = baseUrl + "/routes";
-            
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
-            
             // Add filters for from.x (assuming it's the ID) and to.x (assuming it's the ID)
             // Based on the MainService.yaml, we can filter by from.x and to.x
-            builder.queryParam("filter", "from.x[eq]=" + idFrom);
-            builder.queryParam("filter", "to.x[eq]=" + idTo);
-            
+            // We use .build(false) to avoid double encoding of special characters like [ ] and =
+            // which are part of our filter syntax but might be mis-encoded by RestTemplate or UriComponentsBuilder
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + "/routes")
+                    .queryParam("filter", "from.x[gte]=" + idFrom)
+                    .queryParam("filter", "to.x[lte]=" + idTo);
+
             // Add sorting parameters
             String[] sortFields = orderBy.split(",");
             for (String field : sortFields) {
                 builder.queryParam("sort", field.trim());
             }
             builder.queryParam("sortDirection", sortDirection);
-            
-            String finalUrl = builder.toUriString();
+
+            String finalUrl = builder.build(false).toUriString();
             logger.info("Making GET request to external API: {}", finalUrl);
             
             HttpHeaders headers = new HttpHeaders();
