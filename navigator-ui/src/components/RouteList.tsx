@@ -25,7 +25,7 @@ export function RouteList({ onEdit, refreshTrigger }: RouteListProps) {
   const [data, setData] = useState<RouteResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const [pageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(10);
   const [sort, setSort] = useState<string[]>([]);
   const [sortDirection, setSortDirection] = useState<"ASC" | "DESC">("ASC");
   const [filter, setFilter] = useState<string[]>([]);
@@ -187,24 +187,42 @@ export function RouteList({ onEdit, refreshTrigger }: RouteListProps) {
         </Table>
       </div>
 
-      <div className="flex items-center justify-end space-x-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setPage(p => Math.max(0, p - 1))}
-          disabled={page === 0}
-        >
-          <ChevronLeft className="h-4 w-4" /> Previous
-        </Button>
-        <span className="text-sm font-medium">Page {page + 1}</span>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setPage(p => p + 1)}
-          disabled={!data || data.routes.length < pageSize}
-        >
-          Next <ChevronRight className="h-4 w-4" />
-        </Button>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <span className="text-sm font-medium">Rows per page:</span>
+          {[5, 10, 20, 50].map((size) => (
+            <Button
+              key={size}
+              variant={pageSize === size ? "default" : "outline"}
+              size="sm"
+              onClick={() => {
+                setPageSize(size);
+                setPage(0);
+              }}
+            >
+              {size}
+            </Button>
+          ))}
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            disabled={page === 0}
+          >
+            <ChevronLeft className="h-4 w-4" /> Previous
+          </Button>
+          <span className="text-sm font-medium">Page {page + 1}</span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage(p => p + 1)}
+            disabled={!data || data.routes.length < pageSize}
+          >
+            Next <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
