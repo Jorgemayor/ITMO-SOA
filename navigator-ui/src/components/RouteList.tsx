@@ -74,7 +74,32 @@ export function RouteList({ onEdit, refreshTrigger }: RouteListProps) {
 
   const applyFilter = () => {
     if (filterInput.trim()) {
-      setFilter([filterInput]);
+      // Parse user-friendly filter format: field[operator]value
+      // Supported: =, !=, >=, <=, >, <
+      let backendFilter = filterInput.trim();
+      
+      const operators: Record<string, string> = {
+        ">=": "gte",
+        "<=": "lte",
+        ">": "gt",
+        "<": "lt",
+        "!=": "ne",
+        "=": "eq"
+      };
+
+      for (const [op, code] of Object.entries(operators)) {
+        if (backendFilter.includes(op)) {
+          const parts = backendFilter.split(op);
+          if (parts.length === 2) {
+            const field = parts[0].trim();
+            const value = parts[1].trim();
+            backendFilter = `${field}[${code}]=${value}`;
+            break;
+          }
+        }
+      }
+      
+      setFilter([backendFilter]);
     } else {
       setFilter([]);
     }
@@ -87,7 +112,7 @@ export function RouteList({ onEdit, refreshTrigger }: RouteListProps) {
     <div className="space-y-4">
       <div className="flex gap-2">
         <Input
-          placeholder="Filter (e.g., name=test or distance>100)"
+          placeholder="Filter (e.g., name=test, distance>15, coordinates.x<100)"
           value={filterInput}
           onChange={(e) => setFilterInput(e.target.value)}
           className="max-w-sm"

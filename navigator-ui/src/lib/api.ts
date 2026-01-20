@@ -1,6 +1,20 @@
 import type { Route, RouteRequest, RouteResponse } from "@/types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/navigator/api/v1";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+
+const handleResponse = async (response: Response) => {
+  if (!response.ok) {
+    let message = response.statusText;
+    try {
+      const error = await response.json();
+      message = error.message || message;
+    } catch (_) {
+      // Keep statusText if json parsing fails
+    }
+    throw new Error(message || "Request failed");
+  }
+  return response.json();
+};
 
 export async function fetchRoutes(params: {
   page?: number;
@@ -17,11 +31,7 @@ export async function fetchRoutes(params: {
   if (params.filter) params.filter.forEach(f => query.append("filter", f));
 
   const response = await fetch(`${API_BASE_URL}/routes?${query.toString()}`);
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to fetch routes");
-  }
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function createRoute(route: RouteRequest): Promise<Route> {
@@ -30,11 +40,7 @@ export async function createRoute(route: RouteRequest): Promise<Route> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(route),
   });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to create route");
-  }
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function updateRoute(id: number, route: Partial<RouteRequest>): Promise<Route> {
@@ -43,11 +49,7 @@ export async function updateRoute(id: number, route: Partial<RouteRequest>): Pro
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(route),
   });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to update route");
-  }
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function deleteRoute(id: number): Promise<void> {
@@ -55,34 +57,27 @@ export async function deleteRoute(id: number): Promise<void> {
     method: "DELETE",
   });
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to delete route");
+    let message = response.statusText;
+    try {
+      const error = await response.json();
+      message = error.message || message;
+    } catch (_) {
+    }
+    throw new Error(message || "Failed to delete route");
   }
 }
 
 export async function getRouteWithMinimumName(): Promise<Route> {
   const response = await fetch(`${API_BASE_URL}/route/minimum-name`);
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to get route with minimum name");
-  }
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function getRoutesWithEqualDistance(distance: number): Promise<RouteResponse> {
   const response = await fetch(`${API_BASE_URL}/routes/equal-distance/${distance}`);
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to get routes with equal distance");
-  }
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function getRoutesWithLessDistance(distance: number): Promise<RouteResponse> {
   const response = await fetch(`${API_BASE_URL}/routes/less-distance/${distance}`);
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to get routes with less distance");
-  }
-  return response.json();
+  return handleResponse(response);
 }
