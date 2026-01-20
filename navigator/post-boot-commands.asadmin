@@ -1,0 +1,1 @@
+set-ssl --type http-listener --certname payara-selfsigned https-listener
