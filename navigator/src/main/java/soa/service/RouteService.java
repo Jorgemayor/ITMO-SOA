@@ -148,6 +148,8 @@ public class RouteService {
                 default:
                     return true;
             }
+        } catch (NumberFormatException | java.time.format.DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid value format for field '" + field + "': " + value);
         } catch (Exception e) {
             return true;
         }

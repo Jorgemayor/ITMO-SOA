@@ -55,6 +55,10 @@ public class RouteResource {
             
             return Response.ok(response).build();
             
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new ErrorResponse("BadRequest", e.getMessage()))
+                    .build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(new ErrorResponse("InternalServerError", "An error occurred while processing the request"))
@@ -147,6 +151,10 @@ public class RouteResource {
                     .entity(new ErrorResponse("NotFound", "Route not found with id: " + id))
                     .build();
                     
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new ErrorResponse("BadRequest", e.getMessage()))
+                    .build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(new ErrorResponse("InternalServerError", "An error occurred while retrieving the route"))
@@ -268,6 +276,10 @@ public class RouteResource {
                     .entity(new ErrorResponse("NotFound", "Route not found with id: " + id))
                     .build();
                     
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new ErrorResponse("BadRequest", e.getMessage()))
+                    .build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(new ErrorResponse("InternalServerError", "An error occurred while deleting the route"))
@@ -304,8 +316,17 @@ public class RouteResource {
      */
     @GET
     @Path("/routes/equal-distance/{distance}")
-    public Response getRoutesWithEqualDistance(@PathParam("distance") long distance) {
+    public Response getRoutesWithEqualDistance(@PathParam("distance") String distanceStr) {
         try {
+            long distance;
+            try {
+                distance = Long.parseLong(distanceStr);
+            } catch (NumberFormatException e) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ErrorResponse("BadRequest", "Distance must be a valid number"))
+                        .build();
+            }
+
             if (distance <= 1) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity(new ErrorResponse("BadRequest", "Distance must be > 1"))
@@ -331,8 +352,17 @@ public class RouteResource {
      */
     @GET
     @Path("/routes/less-distance/{distance}")
-    public Response getRoutesWithLessDistance(@PathParam("distance") long distance) {
+    public Response getRoutesWithLessDistance(@PathParam("distance") String distanceStr) {
         try {
+            long distance;
+            try {
+                distance = Long.parseLong(distanceStr);
+            } catch (NumberFormatException e) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ErrorResponse("BadRequest", "Distance must be a valid number"))
+                        .build();
+            }
+
             if (distance <= 1) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity(new ErrorResponse("BadRequest", "Distance must be > 1"))
