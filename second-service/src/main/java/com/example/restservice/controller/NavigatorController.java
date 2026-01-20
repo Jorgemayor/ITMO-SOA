@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
  * Navigator REST endpoint controller
  * Handles route navigation operations
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/navigator")
 public class NavigatorController {
