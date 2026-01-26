@@ -85,6 +85,10 @@
                                 <key>-DJMS_PROVIDER_PORT</key>
                                 <value>7677</value>
                             </option>
+                            <option>
+                                <key>-Xmx512m</key>
+                                <value></value>
+                            </option>
                         </javaCommandLineOptions>
                     </configuration>
                     <dependencies>
