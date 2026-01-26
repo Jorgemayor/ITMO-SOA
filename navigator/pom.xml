@@ -63,13 +63,23 @@
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
-            <!-- Execute 'mvn clean package payara-server:dev' to run the application. -->
+
             <plugin>
                     <groupId>fish.payara.maven.plugins</groupId>
                     <artifactId>payara-server-maven-plugin</artifactId>
                     <version>1.0.0-Alpha3</version>
                     <configuration>
                         <payaraServerVersion>${payara.version}</payaraServerVersion>
+                        <useJavaHome>true</useJavaHome>
+                        <httpPort>8080</httpPort>
+                        <httpsPort>8181</httpsPort>
+                        <adminPort>4848</adminPort>
+                        <commandLineOptions>
+                            <option>
+                                <key>--systemproperties</key>
+                                <value>JMS_PROVIDER_PORT=7677</value>
+                            </option>
+                        </commandLineOptions>
                     </configuration>
                     <dependencies>
                         <!-- Override commons-io version to fix NoSuchMethodError -->
