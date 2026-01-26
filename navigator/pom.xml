@@ -80,6 +80,12 @@
                                 <value>JMS_PROVIDER_PORT=7677</value>
                             </option>
                         </commandLineOptions>
+                        <javaCommandLineOptions>
+                            <option>
+                                <key>-DJMS_PROVIDER_PORT</key>
+                                <value>7677</value>
+                            </option>
+                        </javaCommandLineOptions>
                     </configuration>
                     <dependencies>
                         <!-- Override commons-io version to fix NoSuchMethodError -->
