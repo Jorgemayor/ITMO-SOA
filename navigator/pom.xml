@@ -15,6 +15,11 @@
         <jakartaee-api.version>10.0.0</jakartaee-api.version>
         <payara.version>6.2025.10</payara.version>
         <payara.home>payara6</payara.home>
+        <wdm.os>Linux</wdm.os>
+        <wdm.arch>X64</wdm.arch>
+        <payara.auto.deploy>false</payara.auto.deploy>
+        <payara.hot.deploy>false</payara.hot.deploy>
+        <payara.start.openBrowser>false</payara.start.openBrowser>
     </properties>
     
     <dependencyManagement>
@@ -75,6 +80,8 @@
                         <httpsPort>8181</httpsPort>
                         <adminPort>4848</adminPort>
                         <openBrowser>false</openBrowser>
+                        <browser>none</browser>
+                        <autoDeploy>false</autoDeploy>
                         <hotDeploy>false</hotDeploy>
                         <commandLineOptions>
                             <option>
@@ -84,16 +91,25 @@
                         </commandLineOptions>
                         <javaCommandLineOptions>
                             <option>
-                                <key>-DJMS_PROVIDER_PORT=7677</key>
-                            </option>
-                            <option>
                                 <key>-Dwdm.os=Linux</key>
                             </option>
                             <option>
                                 <key>-Dwdm.arch=X64</key>
                             </option>
                             <option>
-                                <key>-Xmx512m</key>
+                                <key>-Dpayara.start.openBrowser=false</key>
+                            </option>
+                            <option>
+                                <key>-Dfish.payara.maven.plugins.server.openBrowser=false</key>
+                            </option>
+                            <option>
+                                <key>-Dwebdriver.setup.os=Linux</key>
+                            </option>
+                            <option>
+                                <key>-DJMS_PROVIDER_PORT=7677</key>
+                            </option>
+                            <option>
+                                <key>-Xmx256m</key>
                             </option>
                             <option>
                                 <key>-Xss256k</key>

@@ -2,6 +2,6 @@ set-ssl --type http-listener --certname payara-selfsigned https-listener
 set configs.config.server-config.jms-service.jms-host.default_JMS_host.port=7677
 set configs.config.server-config.jms-service.type=EMBEDDED
 set configs.config.server-config.admin-service.das-config.autodeploy-enabled=false
-set configs.config.server-config.network-config.thread-pools.thread-pool.http-thread-pool.max-thread-pool-size=20
+set configs.config.server-config.network-config.thread-pools.thread-pool.http-thread-pool.max-thread-pool-size=10
 set configs.config.server-config.network-config.thread-pools.thread-pool.http-thread-pool.min-thread-pool-size=2
-set configs.config.server-config.network-config.thread-pools.thread-pool.admin-thread-pool.max-thread-pool-size=10
+set configs.config.server-config.network-config.thread-pools.thread-pool.admin-thread-pool.max-thread-pool-size=5
