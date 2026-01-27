@@ -74,6 +74,8 @@
                         <httpPort>8080</httpPort>
                         <httpsPort>8181</httpsPort>
                         <adminPort>4848</adminPort>
+                        <openBrowser>false</openBrowser>
+                        <hotDeploy>false</hotDeploy>
                         <commandLineOptions>
                             <option>
                                 <key>--systemproperties</key>
@@ -88,7 +90,10 @@
                                 <key>-Xmx512m</key>
                             </option>
                             <option>
-                                <key>-Xss512k</key>
+                                <key>-Xss256k</key>
+                            </option>
+                            <option>
+                                <key>-D_JAVA_OPTIONS=-Xss256k</key>
                             </option>
                         </javaCommandLineOptions>
                     </configuration>
