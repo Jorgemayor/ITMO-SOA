@@ -77,7 +77,7 @@
                         <commandLineOptions>
                             <option>
                                 <key>--systemproperties</key>
-                                <value>JMS_PROVIDER_PORT=7677</value>
+                                <value>JMS_PROVIDER_PORT=7677:java.util.logging.config.file=logging.properties</value>
                             </option>
                         </commandLineOptions>
                         <javaCommandLineOptions>
