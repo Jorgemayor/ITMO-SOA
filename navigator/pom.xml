@@ -87,10 +87,22 @@
                                 <key>-DJMS_PROVIDER_PORT=7677</key>
                             </option>
                             <option>
+                                <key>-Dwdm.os=Linux</key>
+                            </option>
+                            <option>
+                                <key>-Dwdm.arch=X64</key>
+                            </option>
+                            <option>
                                 <key>-Xmx512m</key>
                             </option>
                             <option>
                                 <key>-Xss256k</key>
+                            </option>
+                            <option>
+                                <key>-XX:ParallelGCThreads=2</key>
+                            </option>
+                            <option>
+                                <key>-XX:ConcGCThreads=1</key>
                             </option>
                             <option>
                                 <key>-D_JAVA_OPTIONS=-Xss256k</key>
