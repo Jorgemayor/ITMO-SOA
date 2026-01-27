@@ -87,6 +87,9 @@
                             <option>
                                 <key>-Xmx512m</key>
                             </option>
+                            <option>
+                                <key>-Xss512k</key>
+                            </option>
                         </javaCommandLineOptions>
                     </configuration>
                     <dependencies>
