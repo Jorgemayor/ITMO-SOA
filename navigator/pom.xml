@@ -82,12 +82,10 @@
                         </commandLineOptions>
                         <javaCommandLineOptions>
                             <option>
-                                <key>-DJMS_PROVIDER_PORT</key>
-                                <value>7677</value>
+                                <key>-DJMS_PROVIDER_PORT=7677</key>
                             </option>
                             <option>
                                 <key>-Xmx512m</key>
-                                <value></value>
                             </option>
                         </javaCommandLineOptions>
                     </configuration>
