@@ -1,2 +1,4 @@
 set-ssl --type http-listener --certname payara-selfsigned https-listener
 set configs.config.server-config.jms-service.jms-host.default_JMS_host.port=7677
+set configs.config.server-config.jms-service.type=EMBEDDED
+set configs.config.server-config.admin-service.das-config.autodeploy-enabled=false
